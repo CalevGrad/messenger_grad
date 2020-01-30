@@ -31,7 +31,7 @@ CorrespondenceWidget::CorrespondenceWidget(QWidget *parent) : QWidget(parent)
     main_lay->addLayout(right_lay);
 
     this->setLayout(main_lay);
-    dialogs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
     messages->setSelectionMode( QAbstractItemView::NoSelection );
     messages->setFocusPolicy(Qt::NoFocus);
 

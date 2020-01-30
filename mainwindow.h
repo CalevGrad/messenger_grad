@@ -47,7 +47,7 @@ private slots:
     void erorRequest(QString url, QString error_str, QNetworkReply::NetworkError error);
     void resultShow(QString url, QByteArray data);
 
-    void dialog_chosen(int ind);
+    void dialog_clicked(int ind);
 
 private:
     Ui::MainWindow *ui;
