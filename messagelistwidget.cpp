@@ -71,12 +71,8 @@ QWidget* MessageListWidget::getWidget(Message *message, bool foreign)
     message_widget->setObjectName("message_widget");
 
     if (!foreign)
-    {
-        message_widget->setStyleSheet("QWidget#message_widget { border: 1px solid black; margin: 1px; border-radius: 2px; }");
-    }
-    else {
-        message_widget->setStyleSheet("QWidget#message_widget { border: 1px solid black; margin: 1px; border-radius: 2px; background-color: #e0ecff; }");
-    }
+        message_widget->setObjectName("message_widget_mein");
+    else message_widget->setObjectName("message_widget_your");
 
     message_widget->setLayout(lay);
 

@@ -25,6 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        autorizewidget.cpp \
+        correspondencewidget.cpp \
         dialoglistwidget.cpp \
         downloader.cpp \
         main.cpp \
@@ -33,6 +35,8 @@ SOURCES += \
         newdialogwindow.cpp
 
 HEADERS += \
+        autorizewidget.h \
+        correspondencewidget.h \
         dialoglistwidget.h \
         downloader.h \
         mainwindow.h \

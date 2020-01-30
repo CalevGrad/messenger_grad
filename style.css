@@ -1,0 +1,12 @@
+#message_widget_mein {
+    border: 1px solid black;
+    margin: 1px;
+    border-radius: 2px;
+}
+
+#message_widget_your {
+    border: 1px solid black;
+    margin: 1px;
+    border-radius: 2px;
+    background-color: #e0ecff;
+}
