@@ -30,10 +30,12 @@ public:
 
 private:
     QList<Dialog*> list_dialogs;
-    int searchDialog(QString id);
     void updateDialog(int pos, Dialog *dialog);
-    void createDialog(Dialog *dialog);
+    void createDialog(Dialog *dialog, int pos);
     QWidget* getWidget(Dialog *dialog);
+
+signals:
+    void dialogUpdate(bool a);
 };
 
 #endif // DIALOGLISTWIDGET_H

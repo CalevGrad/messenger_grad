@@ -43,8 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalLayout->addWidget(autorize_widget);
     ui->verticalLayout->addWidget(correspondence_widget);
 
-    widget_processing();
-
     autorize_widget_show();
 }
 
@@ -74,10 +72,6 @@ void MainWindow::correspondence_widget_show()
     autorize_widget->hide();
     ui->menuBar->show();
     correspondence_widget->show();
-}
-
-void MainWindow::widget_processing()
-{
 }
 
 void MainWindow::setCSS()
@@ -125,7 +119,7 @@ void MainWindow::resultShow(QString url, QByteArray data)
     QJsonObject root = document.object();
     QJsonArray val = root.value("results").toArray();
     QRegExp dia(".*/dialogs/\\d?/?$"),
-            mes(".*/dialogs/\\d?/?messages/\\??.*"),
+            mes(".*/dialogs/\\d?/messages/\\??.*"),
             lon(".*/users/\\d/longpolling/\\??.*"),
             che(".*/users/check/\\??.*");
 
@@ -138,12 +132,12 @@ void MainWindow::resultShow(QString url, QByteArray data)
             obj = val.at(i).toObject();
 
             message->id = QString(QString::number(obj.value("id").toInt()));
-            message->dialog_id = QString( QString::number(obj.value("dialogID").toInt()) );
-            message->owner_id = QString( QString::number(obj.value("ownerID").toInt()) );
-            message->text = QString(  QByteArray::fromBase64( obj.value("text").toString().toLocal8Bit() ) );
-            message->date = QString( obj.value("date").toString());
+            message->dialog_id = QString(QString::number(obj.value("dialogID").toInt()));
+            message->owner_id = QString(QString::number(obj.value("ownerID").toInt()));
+            message->text = QString(QByteArray::fromBase64(obj.value("text").toString().toStdString().c_str()));
+            message->date = QString(obj.value("date").toString());
 
-            if (message->dialog_id == correspondence_widget->getIdSelectedDialog() &&
+            if (message->dialog_id == correspondence_widget->idSelectedDialog() &&
                 status == '2')
                 correspondence_widget->addMessage(client.id, message);
         }
@@ -184,7 +178,22 @@ void MainWindow::resultShow(QString url, QByteArray data)
             }
 
             if (status == '2' && flag)
+            {
                 correspondence_widget->addOrUpdateDialog(dialog);
+                QString id_sel_dia = correspondence_widget->idSelectedDialog();
+                if (dialog->id == id_sel_dia)
+                {
+                    QMap<QString, QString> buf;
+                    buf.insert("messageID", correspondence_widget->
+                               idLastMessage(correspondence_widget->dialogsCurrentRow()));
+                    buf.insert("countMessages", "1");
+                    buf.insert("indent", "0");
+
+                    downloader->getData("http://127.0.0.1:8000/dialogs/" +
+                                        id_sel_dia + "/messages/",
+                                        (client.login + ':' + client.password).toLocal8Bit(), buf);
+                }
+            }
         }
     }
     else if (che.indexIn(url) != -1) {
@@ -212,13 +221,22 @@ void MainWindow::resultShow(QString url, QByteArray data)
 
 void MainWindow::dialog_clicked(int ind)
 {
-    correspondence_widget->messagesClean();
-    QMap<QString, QString> buf;
-    buf.insert("messageID", correspondence_widget->idLastMessage(ind));
-    buf.insert("countMessages", COUNT_MESSAGES);
+    if (correspondence_widget->isDialogUpdate())
+        return;
 
-    downloader->getData("http://127.0.0.1:8000/dialogs/" + correspondence_widget->idSelectedDialog() +
-                        "/messages/", (client.login + ':' + client.password).toLocal8Bit(), buf);
+    qDebug() << correspondence_widget->idSelectedDialog();
+
+    if (id_selected_dialog != correspondence_widget->idSelectedDialog()) {
+        correspondence_widget->messagesClean();
+        QMap<QString, QString> buf;
+        buf.insert("messageID", correspondence_widget->idLastMessage(ind));
+        buf.insert("countMessages", COUNT_MESSAGES);
+
+        downloader->getData("http://127.0.0.1:8000/dialogs/" + correspondence_widget->idSelectedDialog() +
+                            "/messages/", (client.login + ':' + client.password).toLocal8Bit(), buf);
+
+        id_selected_dialog = correspondence_widget->idSelectedDialog();
+    }
 }
 
 void MainWindow::send_message_button_clicked()
@@ -230,7 +248,8 @@ void MainWindow::send_message_button_clicked()
         QMap<QString, QString> buf1;
 
         buf1.insert("dialogID", id);
-        buf1.insert("text", correspondence_widget->getSendMessageTE().toLocal8Bit().toBase64());
+//        buf1.insert("text", correspondence_widget->getSendMessageTE().toLocal8Bit().toBase64());
+        buf1.insert("text", QByteArray(correspondence_widget->getSendMessageTE().toStdString().c_str()).toBase64());
 
         downloader->postData("http://127.0.0.1:8000/messages/",
                              (client.login + ':' + client.password).toLocal8Bit(),
@@ -262,4 +281,9 @@ void MainWindow::autorize_registration_button_clicked()
     buf1.insert("password", autorize_widget->getPassword());
 
     downloader->postData(address_server"/users/", "", QMap<QString, QString>(), buf1);
+}
+
+void MainWindow::on_exit_triggered()
+{
+    autorize_widget_show();
 }

@@ -7,51 +7,68 @@ DialogListWidget::DialogListWidget()
 {
 }
 
-int DialogListWidget::searchDialog(QString id)
-{
-    // Эта функция ищет позицию диалога в списке по его id
-
-    for (int i = 0; i < list_dialogs.length(); i++)
-        if (id == list_dialogs.value(i)->id)
-            return i;
-    return -1;
-}
-
 void DialogListWidget::updateDialog(int pos, Dialog *dialog)
 {
     // Эта функция обновляет данные диалога и перерисовывает его
+    bool flag = false;
+    int ind = this->currentRow();
+
+    if (ind == pos) {
+        flag = true;
+        emit dialogUpdate(true);
+    }
 
     QWidget *dialog_widget = getWidget(dialog);
-    QListWidgetItem* item = this->takeItem(pos);
+    QListWidgetItem *item = this->takeItem(pos);
 
     list_dialogs.replace(pos, dialog);
     list_dialogs.move(pos, 0);
-
     this->insertItem(0, item);
     this->setItemWidget(item, dialog_widget);
+
+    if (flag) {
+        this->setCurrentRow(0);
+        emit dialogUpdate(false);
+    }
+    else this->setCurrentRow(ind + 1);
+
 }
 
-void DialogListWidget::createDialog(Dialog *dialog)
+void DialogListWidget::createDialog(Dialog *dialog, int pos)
 {
     // Эта функция создаёт новый диалог
 
     QListWidgetItem* item = new QListWidgetItem;
     QWidget *dialog_widget = getWidget(dialog);
 
-    list_dialogs.insert(0, dialog);
+    list_dialogs.insert(pos, dialog);
     item->setSizeHint(dialog_widget->sizeHint());
 
-    this->insertItem(0, item);
+    this->insertItem(pos, item);
     this->setItemWidget( item, dialog_widget );
 }
 
 void DialogListWidget::addOrUpdateDialog(Dialog* dialog)
 {
-    // Эта функция создаёт или обновляет диалог в зависимости от необходимости
-    int pos_sd = searchDialog(dialog->id);
-    if (pos_sd != -1)
-        updateDialog(pos_sd, dialog);
-    else createDialog(dialog);
+    int pos = -1;
+
+    // нахождение места в списке для диалога или обновление диалога,
+    // если он уже есть
+
+    for (int i = list_dialogs.count() - 1; i >= 0; i--) {
+        if (list_dialogs.value(i)->id_last_message.toInt() > dialog->id_last_message.toInt()) {
+            pos = i;
+            break;
+        }
+        if (list_dialogs.value(i)->id == dialog->id)
+        {
+            updateDialog(i, dialog);
+            return;
+        }
+    }
+    pos++;
+
+    createDialog(dialog, pos);
 }
 
 int DialogListWidget::size()

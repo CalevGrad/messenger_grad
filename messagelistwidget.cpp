@@ -8,7 +8,7 @@ MessageListWidget::MessageListWidget()
 
 void MessageListWidget::addMessage(QString user_id, Message *message)
 {
-    int pos = 0;
+    int pos = list_messages.count();
     QListWidgetItem* item = new QListWidgetItem;
     QWidget *message_widget = getWidget(message, message->owner_id == user_id);
 

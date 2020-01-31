@@ -22,15 +22,19 @@ public:
     void sendTEClear();
     void addMessage(QString id, Message *message);
     void addOrUpdateDialog(Dialog *dialog);
+    bool isDialogUpdate();
     QString getSendMessageTE();
     QString getData();
-    QString getIdSelectedDialog();
     QString idLastMessage(int ind);
     QString idSelectedDialog();
+    int dialogsCurrentRow();
+
 
 private:
     DialogListWidget *dialogs;
     MessageListWidget *messages;
+
+    bool dialog_update;
 
     QVBoxLayout *left_lay, // layout сообщений
                 *right_lay; // layout диалогов
@@ -41,6 +45,9 @@ private:
     QTextEdit *send_message_te; // строка для ввода сообщения
     QPushButton *send_message_button,
                 *create_dialog_button;
+
+private slots:
+    void dialogUpdate(bool a);
 
 signals:
     void create_dialog_button_clicked();

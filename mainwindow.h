@@ -30,9 +30,6 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void autorize_window();
-    void autorize_ok_window();
-
     void autorize_widget_show();
     void correspondence_widget_show();
     void longpolling();
@@ -49,6 +46,8 @@ private slots:
 
     void dialog_clicked(int ind);
 
+    void on_exit_triggered();
+
 private:
     Ui::MainWindow *ui;
     User client;
@@ -57,13 +56,13 @@ private:
     CorrespondenceWidget *correspondence_widget;
     NewDialogWindow *new_dialog_window;
     QLabel *status_bar_text;
+    QString id_selected_dialog;
 
     char status; // 1 - авторизация, 2 - вход выполнен, 3 - создание диалога
 
     void clean_layout(QLayout *lay);
     void show_widgets(QLayout *lay);
     void setCSS();
-    void widget_processing();
 };
 
 #endif // MAINWINDOW_H

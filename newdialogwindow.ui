@@ -41,7 +41,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextBrowser" name="text_fir_mes_tb"/>
+      <widget class="QTextEdit" name="text_fir_mes_te"/>
      </item>
      <item>
       <widget class="QPushButton" name="start_dia_button">

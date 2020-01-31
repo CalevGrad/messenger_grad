@@ -20,6 +20,8 @@ CorrespondenceWidget::CorrespondenceWidget(QWidget *parent) : QWidget(parent)
     send_message_lay = new QHBoxLayout;
     send_message_te = new QTextEdit;
 
+    dialog_update = false;
+
     send_message_lay->addWidget(send_message_te);
     send_message_lay->addWidget(send_message_button);
     left_lay->addWidget(stat);
@@ -43,6 +45,7 @@ CorrespondenceWidget::CorrespondenceWidget(QWidget *parent) : QWidget(parent)
     connect(create_dialog_button, &QPushButton::clicked, this,
             &CorrespondenceWidget::create_dialog_button_clicked);
     connect(dialogs, SIGNAL(currentRowChanged(int)), this, SIGNAL(dialog_clicked(int)));
+    connect(dialogs, SIGNAL(dialogUpdate(bool)), this, SLOT(dialogUpdate(bool)));
 }
 
 void CorrespondenceWidget::messagesClean()
@@ -83,11 +86,6 @@ QString CorrespondenceWidget::getData()
     return data;
 }
 
-QString CorrespondenceWidget::getIdSelectedDialog()
-{
-    return dialogs->id_selected_dialog();
-}
-
 QString CorrespondenceWidget::idLastMessage(int ind)
 {
     return dialogs->id_last_message(ind);
@@ -98,6 +96,16 @@ QString CorrespondenceWidget::idSelectedDialog()
     return dialogs->id_selected_dialog();
 }
 
+int CorrespondenceWidget::dialogsCurrentRow()
+{
+    return dialogs->currentRow();
+}
+
+void CorrespondenceWidget::dialogUpdate(bool a)
+{
+    dialog_update = a;
+}
+
 void CorrespondenceWidget::addMessage(QString id, Message *message)
 {
     messages->addMessage(id, message);
@@ -106,4 +114,9 @@ void CorrespondenceWidget::addMessage(QString id, Message *message)
 void CorrespondenceWidget::addOrUpdateDialog(Dialog *dialog)
 {
     dialogs->addOrUpdateDialog(dialog);
+}
+
+bool CorrespondenceWidget::isDialogUpdate()
+{
+    return dialog_update;
 }
